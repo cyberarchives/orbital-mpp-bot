@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbital | MPP Bot</title>
+    <style>
+        body, html {
+            font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            font-size: 14px;
+            background-color: transparent;
+            color: #e4e4e9;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        /* Main container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header bar */
+        .app-header {
+            background-color: #2a2438;
+            border-bottom: 1px solid #483a58;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-app-region: drag;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        
+        .app-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #e4e4e9;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+        }
+
+        .window-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            -webkit-app-region: no-drag;
+        }
+
+        .minimize {
+            background-color: #ffd166;
+        }
+
+        .maximize {
+            background-color: #06d6a0;
+        }
+
+        .close {
+            background-color: #ef476f;
+        }
+
+        /* Note counter bar */
+        .note-counter-bar {
+            background-color: #352f44;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-bottom: 1px solid #483a58;
+        }
+
+        .counter-item {
+            font-size: 14px;
+            color: #e4e4e9;
+        }
+
+        /* Main content area */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: #352f44;
+            border-right: 1px solid #483a58;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+        }
+
+        .room-input {
+            background-color: #2a2438;
+            border: 1px solid #483a58;
+            border-radius: 4px;
+            color: #e4e4e9;
+            padding: 8px;
+            margin-bottom: 10px;
+            width: calc(100% - 18px);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+        }
+
+        input[type="checkbox"] {
+            accent-color: #9f86c0;
+        }
+
+        .client-section {
+            margin-top: 10px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            color: #c8b6e2;
+            margin-bottom: 5px;
+        }
+
+        .clients-list {
+            background-color: #2a2438;
+            border: 1px solid #483a58;
+            border-radius: 4px;
+            height: 100px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .client-item {
+            text-align: left;
+            padding-left: 10px;
+            justify-content: flex-start;
+            display: block;
+        }
+
+        .clients-list {
+            text-align: left;
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background-color: #9f86c0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #8568a9;
+        }
+
+        .btn-secondary {
+            background-color: #483a58;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a4b6c;
+        }
+
+        .file-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-display {
+            background-color: #2a2438;
+            border: 1px solid #483a58;
+            border-radius: 4px;
+            padding: 8px;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-options {
+            margin-top: 10px;
+        }
+
+        /* Central panel */
+        .main-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            background-color: #352f44;
+        }
+
+        .chat-container {
+            flex: 1;
+            background-color: #2a2438;
+            border: 1px solid #483a58;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow-y: auto;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background-color: #2a2438;
+            border: 1px solid #483a58;
+            border-radius: 4px;
+            color: #e4e4e9;
+            padding: 8px;
+        }
+
+        /* Right sidebar */
+        .sidebar-right {
+            width: 200px;
+            background-color: #352f44;
+            border-left: 1px solid #483a58;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .list-title {
+            font-size: 13px;
+            color: #c8b6e2;
+            margin-bottom: 5px;
+        }
+
+        .list-box {
+            flex: 1;
+            background-color: #2a2438;
+            border: 1px solid #483a58;
+            border-radius: 4px;
+            overflow-y: auto;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2a2438;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #483a58;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a4b6c;
+        }
+
+        /* Context menu */
+        .context-menu {
+            display: none;
+            position: absolute;
+            background: #2a2438;
+            border: 1px solid #483a58;
+            border-radius: 4px;
+            padding: 5px 0;
+            width: 150px;
+            list-style: none;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .context-menu li {
+            padding: 8px 12px;
+            color: #e4e4e9;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .context-menu li:hover {
+            background: #9f86c0;
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background-color: #2a2438;
+            color: #e4e4e9;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 13px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-info {
+            border-left: 3px solid #06d6a0;
+        }
+
+        .toast-error {
+            border-left: 3px solid #ef476f;
+        }
+
+        .toast-warning {
+            border-left: 3px solid #ffd166;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Window title bar -->
+        <div class="app-header">
+            <div class="app-title">Orbital MPP Bot | Made by Snoofz</div>
+            <div class="window-controls">
+                <div class="window-control minimize"></div>
+                <div class="window-control maximize"></div>
+                <div class="window-control close"></div>
+            </div>
+        </div>
+
+        <!-- Note counter bar -->
+        <div class="note-counter-bar">
+            <div class="counter-item">Total Notes Played: 0</div>
+            <div class="counter-item">Max Note Quota: 1000</div>
+            <div class="counter-item">Note Quota Allowance: 1000</div>
+        </div>
+
+        <!-- Main content area -->
+        <div class="main-content">
+            <!-- Left sidebar -->
+            <div class="sidebar">
+                <input type="text" class="room-input" placeholder="Room" value="Room">
+                
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked> Visible
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked> Chat
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox"> Solo
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox"> Turns
+                    </label>
+                </div>
+
+                <div class="client-section">
+                    <div class="section-title">Active Clients</div>
+                    <div class="clients-list"></div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn">Connect</button>
+                    <button class="btn btn-secondary">Disconnect</button>
+                </div>
+
+                <div class="file-input-group">
+                    <button class="btn btn-secondary">Choose File</button>
+                    <div class="file-display">No file chosen</div>
+                </div>
+
+                <div class="chat-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked> Send Chat
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked> Receive Chat
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked> Scroll Chat
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked> Welcome Messages
+                    </label>
+                </div>
+            </div>
+
+            <!-- Central panel (main content) -->
+            <div class="main-panel">
+                <div class="chat-container">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="input-container">
+                    <input type="text" class="chat-input" placeholder="Type a message...">
+                    <button class="btn">Send</button>
+                </div>
+            </div>
+
+            <!-- Right sidebar -->
+            <div class="sidebar-right">
+                <div class="list-container">
+                    <div class="list-title">MIDI Files</div>
+                    <div class="list-box" id="midi-list">
+                        <!-- MIDI files will be listed here -->
+                    </div>
+                </div>
+                <div class="list-container">
+                    <div class="list-title">Users</div>
+                    <div class="list-box" id="user-list">
+                        <!-- Users will be listed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context menu (hidden by default) -->
+    <ul class="context-menu" id="contextMenu">
+        <li>Option 1</li>
+        <li>Option 2</li>
+        <li>Option 3</li>
+    </ul>
+
+    <!-- Toast container -->
+    <div class="toast-container">
+        <!-- Toast notifications will appear here -->
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="midifile" style="display: none;">
+
+    <script src="./main.js"></script>
+</body>
+</html>
