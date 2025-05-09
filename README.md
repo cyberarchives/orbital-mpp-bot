@@ -1,4 +1,4 @@
-﻿# official-nmpb-js
+﻿# Orbital MPP Bot
 
 ### Requirements
 [Node.js](https://nodejs.org/en/)
